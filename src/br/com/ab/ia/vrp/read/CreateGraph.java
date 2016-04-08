@@ -113,6 +113,7 @@ public class CreateGraph {
             }
         }
         this.graph.setAdjacentMatrix(matrix);
+        this.graph.setNodes(nodes);
     }
 
 

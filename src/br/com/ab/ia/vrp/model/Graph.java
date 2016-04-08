@@ -1,6 +1,7 @@
 package br.com.ab.ia.vrp.model;
 
 public class Graph {
+    private Node[] nodes;
     private int[][] adjacentMatrix;
     private int[] demand;
     private int capacity;
@@ -22,5 +23,11 @@ public class Graph {
     }
     public void setAdjacentMatrix(int[][] adjacentMatrix) {
         this.adjacentMatrix = adjacentMatrix;
+    }
+    public Node[] getNodes() {
+        return nodes;
+    }
+    public void setNodes(Node[] nodes) {
+        this.nodes = nodes;
     }
 }
