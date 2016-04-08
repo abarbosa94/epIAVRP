@@ -36,7 +36,7 @@ public class SimulatedAnnealing {
     }
 
     public void MoveTransformation(Graph graph, int numberOfTrucks) {
-        List<Node> minimumValues = GraphMinimumValues(graph);
+        List<Node> minimumValues = MoveMinimumNeighborhood(graph);
         List<Integer> random = new ArrayList<Integer>();
         for (int i = 0; i < 5; i++) {
             random.add(i);
@@ -78,7 +78,7 @@ public class SimulatedAnnealing {
         }
     }
 
-    private List<Node> GraphMinimumValues(Graph graph) {
+    private List<Node> MoveMinimumNeighborhood(Graph graph) {
 
         //reutilization of data structure
         //'node' index = distance value

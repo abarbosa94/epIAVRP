@@ -17,6 +17,11 @@ public class ProblemSolution {
         SimulatedAnnealing sa = new SimulatedAnnealing();
         sa.InitialSolution(graphT, nodes,5);
         sa.MoveTransformation(graphT, 5);
+        System.out.println(sa.routes.get(0).getCapacityRoute());
+        System.out.println(sa.routes.get(1).getCapacityRoute());
+        System.out.println(sa.routes.get(2).getCapacityRoute());
+        System.out.println(sa.routes.get(3).getCapacityRoute());
+        System.out.println(sa.routes.get(4).getCapacityRoute());
         /*for(int i = 0; i<result.length; i++) {
             for(int j = 0; j<result.length; j++) {
                 System.out.print(result[i][j]+" ");
