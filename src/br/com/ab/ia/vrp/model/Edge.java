@@ -1,11 +1,10 @@
 package br.com.ab.ia.vrp.model;
 
-public class Edge implements Comparable<Edge> {
+public class Edge  {
     private Node n1;
     private Node n2;
     private int val;
 
-    private Edge next;
 
     public Edge(Node ln1,Node ln2){
         this.setN1(ln1);
@@ -29,14 +28,6 @@ public class Edge implements Comparable<Edge> {
         this.n2 = n2;
     }
 
-    public Edge getNext() {
-        return next;
-    }
-
-    public void setNext(Edge next) {
-        this.next = next;
-    }
-
     public int getVal() {
         return val;
     }
@@ -53,24 +44,6 @@ public class Edge implements Comparable<Edge> {
         this.val = (int)Math.round(Math.sqrt((xd*xd + yd*yd)));
     }
 
-    public void reverse(){
-        Node swap = this.n2;
-        this.n2 = n1;
-        this.n1 = swap;
-    }
 
-    public void connect(Edge e1){
-        setNext(e1);
-    }
-
-    @Override
-    public int compareTo(Edge o) {
-        if(this.val<o.val)
-            return -1;
-        else if(o.val == this.val)
-            return 0;
-        else
-            return 1;
-    }
 
 }

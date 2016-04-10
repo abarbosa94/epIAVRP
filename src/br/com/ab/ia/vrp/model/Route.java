@@ -14,6 +14,7 @@ public class Route {
         for(Integer route: routes){
             System.out.print(route+" ");
         }
+        System.out.println();
     }
     public void setRoute(int route) {
         if(routes.size()==0) {
