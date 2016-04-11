@@ -18,7 +18,7 @@ public class ProblemSolution {
         Node[] nodes = graphT.getNodes();
 
         SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, 5);
-        sa.AnnealingCVRP(0.98, 1.02, 5, 5000);
+        sa.AnnealingCVRP(0.99, 1.05, 5, 5000,50000000);
         long endTime   = System.currentTimeMillis();
         HashMap<Integer, Route> solution = sa.getRoutes();
         long totalTime = endTime - startTime;
@@ -30,7 +30,7 @@ public class ProblemSolution {
             }
             System.out.print("custo: ");
             System.out.print(solution.get(i).calculateRouteCost(graphT)+" ");
-            System.out.println("demanda atendida: "+solution.get(i).getCapacityRoute());
+            System.out.println("demanda atendida: "+solution.get(i).getCapacityRoute(graphT));
 
         }
         System.out.println("Custo: "+sa.costFunction(solution, graphT));

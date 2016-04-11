@@ -27,42 +27,63 @@ public class SimulatedAnnealing {
 
 
 
-    public void AnnealingCVRP(double alfa,double beta,double MZero, double T){
+    public void AnnealingCVRP(double alfa,double beta,double MZero, double T, double maxTime){
         HashMap<Integer,Route> bestSolution = new HashMap<Integer,Route>();
-        bestSolution = this.getRoutes();
+        for(int i =0; i<this.routes.size();i++) {
+            Route r = new Route();
+            r.assignRoute(this.routes.get(i).getRoute());
+            r.setCapacityRoute(this.routes.get(i).getCapacityRoute(graph));
+            bestSolution.put(i,r);
+        }
         HashMap<Integer,Route> currentS = new HashMap<Integer,Route>();
-        currentS = this.getRoutes();
+        for(int i =0; i<this.routes.size();i++) {
+            Route r = new Route();
+            r.assignRoute(this.routes.get(i).getRoute());
+            r.setCapacityRoute(this.routes.get(i).getCapacityRoute(graph));
+            currentS.put(i,r);
+        }
         int currentCost = costFunction(currentS, this.graph);
         int bestCost = costFunction(bestSolution, this.graph);
+        double time = 0;
         do {
             System.out.println(T);
             double M = MZero;
             do{
+
                 HashMap<Integer,Route> newS = new HashMap<Integer,Route>();
-               if(Math.random()<0.8) {
-                   newS = MoveTransformation(currentS,this.graph);
+                for(int i =0; i<currentS.size();i++) {
+                    Route r = new Route();
+                    r.assignRoute(currentS.get(i).getRoute());
+                    r.setCapacityRoute(currentS.get(i).getCapacityRoute(graph));
+                    newS.put(i,r);
+                }
+              if(Math.random()<0.8) {
+                   newS = MoveTransformation(newS,this.graph);
                }
-               newS = ReplaceHighestAverage(currentS, this.graph);
+               newS = ReplaceHighestAverage(newS, this.graph);
                int newCost = costFunction(newS, this.graph);
                int deltaCost = newCost - currentCost;
                if(deltaCost<0) {
-                   currentS = newS;
+                   currentS = new HashMap<Integer,Route>(newS);
                    currentCost = costFunction(currentS,this.graph);
                    if(newCost<bestCost) {
                        bestSolution = newS;
                        bestCost = costFunction(bestSolution,this.graph);
                    }
-               }
 
+               }
                else if(Math.random() < Math.pow(Math.E, (-(double)deltaCost/T))) {
                    currentS = newS;
                    currentCost = costFunction(currentS, this.graph);
                }
+               bestCost = costFunction(bestSolution,this.graph);
+
                M = M-1;
             }while(M>=0);
+            time = time + MZero;
             T = alfa*T;
             MZero = beta*MZero;
-        }while(T>0.001);
+        }while(time < maxTime && T>0.001);
         this.setRoutes(bestSolution);
     }
 
@@ -74,7 +95,7 @@ public class SimulatedAnnealing {
             routes.put(i, r);
             //the first node is the depot node
             for(int j = 1; j<graph.getAdjacentMatrix().length;j++) {
-                if(node[j].visited == false && routes.get(i).getCapacityRoute()+ graph.getDemand()[j] < graph.getCapacity()) {
+                if(node[j].visited == false && (routes.get(i).getCapacityRoute(graph)+ graph.getDemand()[j]) < graph.getCapacity()) {
                     r.setCapacityRoute(graph.getDemand()[j]);
                     r.setRoute(j);
                     node[j].visited = true;
@@ -94,7 +115,8 @@ public class SimulatedAnnealing {
             random.add(i);
         }
         Collections.shuffle(random);
-        for (int c = 0; c< 5; c++) {
+        int routeSize = routes.keySet().size();
+        for (int c = 0; c< routeSize; c++) {
             int randomNumber = random.get(c);
             Node randomNode = minimumValues.get(randomNumber);
             int indexCustomer = (int)randomNode.getX();
@@ -110,13 +132,13 @@ public class SimulatedAnnealing {
 
            }
            random = new ArrayList<Integer>();
-           for (int i = 0; i < routes.keySet().size(); i++) {
+           for (int i = 0; i < routeSize; i++) {
                random.add(i);
            }
            Collections.shuffle(random);
            for(Integer keyRoutes: random){
-               if(routes.get(keyRoutes).getCapacityRoute() +
-                       graph.getDemand()[indexCustomer] < graph.getCapacity()) {
+               if((routes.get(keyRoutes).getCapacityRoute(graph) +
+                       graph.getDemand()[indexCustomer]) < graph.getCapacity()) {
                    List<Integer> tmpRoutes = new ArrayList<Integer>();
                    for(Integer client: routes.get(keyRoutes).getRoute()) {
                        if(client != 0) {
@@ -128,8 +150,8 @@ public class SimulatedAnnealing {
                    tmpRoutes.add(0, 0);
                    tmpRoutes.add(tmpRoutes.size(), 0);
                    routes.get(keyRoutes).assignRoute(tmpRoutes);
-
-                   routes.get(keyRoutes).setCapacityRoute(graph.getDemand()[indexCustomer]);
+                   int newCapacity = routes.get(keyRoutes).getCapacityRoute(graph);
+                   routes.get(keyRoutes).assignNewCapacity(newCapacity);
                    break;
 
                }
@@ -144,7 +166,8 @@ public class SimulatedAnnealing {
     public HashMap<Integer,Route> ReplaceHighestAverage(HashMap<Integer,Route> routes, Graph graph) {
         List<Integer> indexesToRemove = getMaxiumAverages(graph, routes);
         //remove Customers from their Routes
-        for(int c = 0; c<indexesToRemove.size(); c++) {
+        int indexesToRemoveSize = indexesToRemove.size();
+        for(int c = 0; c<indexesToRemoveSize; c++) {
             int indexCustomer = indexesToRemove.get(c);
             for(Integer keyRoutes: routes.keySet()){
                 if(routes.get(keyRoutes).getRoute().contains(indexCustomer)) {
@@ -170,7 +193,6 @@ public class SimulatedAnnealing {
         for(int i=0; i<5;i++) {
             randomRoutes.put(i, routes.get(randomNumbers.get(i)));
         }
-
         for(int i=0; i<5;i++) {
             //route to include customer
             int keyRoutes = -1;
@@ -189,12 +211,13 @@ public class SimulatedAnnealing {
                     }
 
                 }
-
                 tmpRoutes.add(indexesToRemove.get(i));
                 tmpRoutes.add(0, 0);
                 tmpRoutes.add(tmpRoutes.size(), 0);
                 routes.get(keyRoutes).assignRoute(tmpRoutes);
-                routes.get(keyRoutes).setCapacityRoute(graph.getDemand()[indexesToRemove.get(i)]);
+                int newCapacity = routes.get(keyRoutes).getCapacityRoute(graph);
+                routes.get(keyRoutes).assignNewCapacity(newCapacity);
+
 
 
         }
@@ -210,20 +233,22 @@ public class SimulatedAnnealing {
         int globalMinimumRouteCost = 0;
         int globalMinimumRouteIndex = -1;
         for(Integer keyRoutes: randomRoutes.keySet()) {
-            int antpen = randomRoutes.get(keyRoutes).getRoute().get(randomRoutes.get(keyRoutes).getRoute().size()-2);
+            int pen = randomRoutes.get(keyRoutes).getRoute().get(randomRoutes.get(keyRoutes).getRoute().size()-2);
             int newValue = 0;
-            if(customer > antpen) newValue = graph.getAdjacentMatrix()[antpen][customer];
-            else if(customer <= antpen) newValue = graph.getAdjacentMatrix()[customer][antpen];
+            newValue = graph.getAdjacentMatrix()[pen][customer];
             int currentPathCost = randomRoutes.get(keyRoutes).calculateRouteCost(graph)
-                    -graph.getAdjacentMatrix()[0][antpen]
+                    -graph.getAdjacentMatrix()[0][pen]
                     +newValue
                     +graph.getAdjacentMatrix()[0][customer];
             int currentRouteIndex = keyRoutes;
-            if(globalMinimumRouteCost == 0 && (randomRoutes.get(keyRoutes).getCapacityRoute()+graph.getDemand()[customer]) <= graph.getCapacity()) {
+            int a = randomRoutes.get(keyRoutes).getCapacityRoute(graph);
+            int b = graph.getDemand()[customer];
+            int c = graph.getCapacity();
+            if(globalMinimumRouteCost == 0 && (randomRoutes.get(keyRoutes).getCapacityRoute(graph)+graph.getDemand()[customer]) <= graph.getCapacity()) {
                 globalMinimumRouteCost = currentPathCost;
                 globalMinimumRouteIndex = currentRouteIndex;
             }
-            else if(globalMinimumRouteCost > currentPathCost && (randomRoutes.get(keyRoutes).getCapacityRoute()+graph.getDemand()[customer]) <= graph.getCapacity()) {
+            else if(globalMinimumRouteCost > currentPathCost && (randomRoutes.get(keyRoutes).getCapacityRoute(graph)+graph.getDemand()[customer]) <= graph.getCapacity()) {
                 globalMinimumRouteCost = currentPathCost;
                 globalMinimumRouteIndex = currentRouteIndex;
             }
@@ -276,18 +301,8 @@ public class SimulatedAnnealing {
                 int next = currentRoute.get(i+1);
                 double distAnt = 0;
                 double distNxt = 0;
-                if(previous>current) {
-                    distAnt = graph.getAdjacentMatrix()[current][previous];
-                }
-                else if(previous<=current) {
-                    distAnt = graph.getAdjacentMatrix()[previous][current];
-                }
-                if(next>current) {
-                    distNxt = graph.getAdjacentMatrix()[current][next];
-                }
-                else if(next<=current) {
-                    distNxt = graph.getAdjacentMatrix()[next][current];
-                }
+                distAnt = graph.getAdjacentMatrix()[current][previous];
+                distNxt = graph.getAdjacentMatrix()[current][next];
                 double distAvg = (distAnt+distNxt)/2;
                 for(int j = 0; j<maximumAverages.length; j++) {
                     if(distAvg > maximumAverages[j]) {
@@ -306,10 +321,10 @@ public class SimulatedAnnealing {
     }
 
 
-    public int costFunction(HashMap<Integer,Route> routes, Graph g) {
+    public int costFunction(HashMap<Integer,Route> routesT, Graph g) {
         int totalCost = 0;
-        for(Integer keyRoute: routes.keySet()) {
-            totalCost += routes.get(keyRoute).calculateRouteCost(g);
+        for(Integer keyRoute: routesT.keySet()) {
+            totalCost += routesT.get(keyRoute).calculateRouteCost(g);
         }
         return totalCost;
     }

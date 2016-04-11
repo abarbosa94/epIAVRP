@@ -109,7 +109,8 @@ public class CreateGraph {
         for(int i =0; i< nodes.length; i++) {
             for(int j = i+1; j<matrix.length;j++) {
                 Edge edge = new Edge(nodes[i],nodes[j]);
-                matrix[nodes[i].getIndex()][j] = edge.getVal();
+                matrix[i][j] = edge.getVal();
+                matrix[j][i] = edge.getVal();
             }
         }
         this.graph.setAdjacentMatrix(matrix);
