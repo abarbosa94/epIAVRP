@@ -38,8 +38,8 @@ public class Route {
     public int calculateRouteCost(Graph g) {
         int totalCost = 0;
         for(int i = 1; i<routes.size();i++) {
-            int current = i;
-            int previous = i-1;
+            int current = routes.get(i);
+            int previous = routes.get(i-1);
             int costPath = 0;
             costPath = g.getAdjacentMatrix()[previous][current];
             totalCost += costPath;

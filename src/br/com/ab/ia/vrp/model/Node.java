@@ -1,6 +1,6 @@
 package br.com.ab.ia.vrp.model;
 
-public class Node  {
+public class Node implements Comparable<Node>  {
     public boolean visited;
     public Route route;
     private int index;
@@ -23,6 +23,13 @@ public class Node  {
     }
     public void setIndex(int index) {
         this.index = index;
+    }
+    @Override
+    public int compareTo(Node o) {
+        // TODO Auto-generated method stub
+        int compareQuantity = o.getIndex();
+        //descending order
+        return compareQuantity - this.index;
     }
 
 }
