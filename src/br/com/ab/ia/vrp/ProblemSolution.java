@@ -18,7 +18,7 @@ public class ProblemSolution {
         Node[] nodes = graphT.getNodes();
 
         SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, 5);
-        sa.AnnealingCVRP(0.99, 1.05, 5, 5000,32000000);
+        sa.AnnealingCVRP(0.99, 1.05, 5, 5000,30000000);
         long endTime   = System.currentTimeMillis();
         HashMap<Integer, Route> solution = sa.getRoutes();
         long totalTime = endTime - startTime;

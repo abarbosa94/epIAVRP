@@ -65,7 +65,9 @@ public class SimulatedAnnealing {
                  if(Math.random()<0.8) {
                      newS = MoveTransformation(newS,this.graph);
                 }
-                newS = ReplaceHighestAverage(newS, this.graph);
+                HashMap<Integer, Route> solutionTest = new HashMap<Integer, Route>();
+                solutionTest = ReplaceHighestAverage(newS, this.graph);
+                if(solutionTest!=null) newS = solutionTest;
                 int newCost = costFunction(newS, this.graph);
                 int deltaCost = newCost - currentCost;
                 if (deltaCost < 0) {
@@ -182,7 +184,14 @@ public class SimulatedAnnealing {
 
     }
 
-    public HashMap<Integer,Route> ReplaceHighestAverage(HashMap<Integer,Route> routes, Graph graph) {
+    public HashMap<Integer,Route> ReplaceHighestAverage(HashMap<Integer,Route> original, Graph graph) {
+        HashMap<Integer,Route> routes = new HashMap<Integer,Route>();
+        for(int keySet = 0; keySet<original.keySet().size(); keySet++) {
+            Route r = new Route();
+            r.assignRoute(original.get(keySet).getRoute());
+            r.setCapacityRoute(original.get(keySet).getCapacityRoute(graph));
+            routes.put(keySet, r);
+        }
         List<Integer> indexesToRemove = getMaxiumAverages(graph, routes);
         //remove Customers from their Routes
         int indexesToRemoveSize = indexesToRemove.size();
@@ -201,6 +210,7 @@ public class SimulatedAnnealing {
            }
         }
         //Select five random routes
+
         List<Integer> randomNumbers = new ArrayList<Integer>();
         for (int i = 0; i < routes.keySet().size(); i++) {
             randomNumbers.add(i);
@@ -230,22 +240,7 @@ public class SimulatedAnnealing {
                 }
             }
             if(minimumIndex==-1) {
-                int tmp = indexesToRemove.get(k-1);
-                indexesToRemove.set(k-1, indexesToRemove.get(k));
-                indexesToRemove.set(k, tmp);
-                for(Integer keyRoutes: routes.keySet()){
-                    if(routes.get(keyRoutes).getRoute().contains(tmp)) {
-                        //indexToRemove is the index of the route list
-                        //indexCustomer is the 'real' index, or the value inside route list
-                        int indexToRemove = routes.get(keyRoutes).getRoute().indexOf(tmp);
-                        routes.get(keyRoutes).getRoute().remove(indexToRemove);
-                        routes.get(keyRoutes).setCapacityRoute(-graph.getDemand()[tmp]);
-                        break;
-                    }
-                }
-
-                k = k-2;
-                continue;
+                return null;
 
             }
             routes.get(minimumRoute).getRoute().add(minimumIndex+1, indexesToRemove.get(k));
