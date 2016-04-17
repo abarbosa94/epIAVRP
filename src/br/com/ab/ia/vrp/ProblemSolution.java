@@ -13,11 +13,11 @@ public class ProblemSolution {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        CreateGraph read = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/A-VRP/A-n32-k5.vrp");
+        CreateGraph read = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/P-VRP/P-n16-k8.vrp");
         Graph graphT = read.getGraph();
         Node[] nodes = graphT.getNodes();
 
-        SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, 5);
+        SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, 8);
         sa.AnnealingCVRP(0.99, 1.05, 5, 5000,30000000);
         long endTime   = System.currentTimeMillis();
         HashMap<Integer, Route> solution = sa.getRoutes();

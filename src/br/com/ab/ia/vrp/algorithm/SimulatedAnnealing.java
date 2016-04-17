@@ -62,10 +62,11 @@ public class SimulatedAnnealing {
                     r.setCapacityRoute(currentS.get(i).getCapacityRoute(graph));
                     newS.put(i, r);
                 }
-                 if(Math.random()<0.8) {
-                     newS = MoveTransformation(newS,this.graph);
-                }
                 HashMap<Integer, Route> solutionTest = new HashMap<Integer, Route>();
+                 if(Math.random()<0.8) {
+                     solutionTest = MoveTransformation(newS,this.graph);
+                     if(solutionTest!=null) newS = solutionTest;
+                }
                 solutionTest = ReplaceHighestAverage(newS, this.graph);
                 if(solutionTest!=null) newS = solutionTest;
                 int newCost = costFunction(newS, this.graph);
@@ -117,7 +118,14 @@ public class SimulatedAnnealing {
         return routes;
     }
 
-    public HashMap<Integer, Route> MoveTransformation(HashMap<Integer, Route> routes, Graph graph) {
+    public HashMap<Integer, Route> MoveTransformation(HashMap<Integer, Route> original, Graph graph) {
+        HashMap<Integer,Route> routes = new HashMap<Integer,Route>();
+        for(int keySet = 0; keySet<original.keySet().size(); keySet++) {
+            Route r = new Route();
+            r.assignRoute(original.get(keySet).getRoute());
+            r.setCapacityRoute(original.get(keySet).getCapacityRoute(graph));
+            routes.put(keySet, r);
+        }
         List<Integer> minimumValues = MinimumDistance(graph, routes);
         List<Integer> random = new ArrayList<Integer>();
         for (int i = 1; i < graph.getAdjacentMatrix().length; i++) {
@@ -152,11 +160,11 @@ public class SimulatedAnnealing {
         }
         Collections.shuffle(randomRoute);
         for (Integer customerToInsert : random) {
+            int minimumIndex = -1;
+            int minimumDistance = -1;
             for (Integer keyRoutes : randomRoute) {
                 if ((routes.get(keyRoutes).getCapacityRoute(graph) + graph
                         .getDemand()[customerToInsert]) <= graph.getCapacity()) {
-                    int minimumIndex = -1;
-                    int minimumDistance = -1;
                     for (int i = 0; i < routes.get(keyRoutes).getRoute().size()-1; i++) {
                         int currentCustomer = routes.get(keyRoutes).getRoute()
                                 .get(i);
@@ -178,6 +186,7 @@ public class SimulatedAnnealing {
                 }
 
             }
+            if(minimumIndex == -1) return null;
         }
 
         return routes;
