@@ -51,7 +51,6 @@ public class SimulatedAnnealing {
         int bestCost = costFunction(bestSolution, this.graph);
         double time = 0;
         do {
-            System.out.println(T);
             double M = MZero;
             do {
 

@@ -13,7 +13,7 @@ public class ProblemSolution {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        CreateGraph read = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/B-VRP/B-n31-k5");
+        CreateGraph read = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/B-VRP/B-n31-k5.vrp");
         Graph graphT = read.getGraph();
         Node[] nodes = graphT.getNodes();
         int numberOfTrucks = read.getNumberOfTrucks();
@@ -22,7 +22,6 @@ public class ProblemSolution {
         long endTime   = System.currentTimeMillis();
         HashMap<Integer, Route> solution = sa.getRoutes();
         long totalTime = endTime - startTime;
-       System.out.println("***SOLUTION****");
         for(int i=0; i< solution.keySet().size();i++) {
             System.out.print("Rota #"+(i+1)+": ");
             for(int j = 0; j<solution.get(i).getRoute().size(); j++) {
