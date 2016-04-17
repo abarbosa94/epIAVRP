@@ -14,6 +14,7 @@ public class CreateGraph {
     private Node[] nodes;
     private int[] demands;
     private int capacity;
+    private int numberOfTrucks;
 
     public CreateGraph(String filename) {
         try {
@@ -29,15 +30,18 @@ public class CreateGraph {
 
 
     private void ReadFile(String filename) throws FileNotFoundException {
-        //String filename = "/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/A-VRP/A-n32-k5.vrp";
-
         try {
             reader = new BufferedReader(new FileReader(filename));
             String line;
             while ((line = reader.readLine()) != null)
             {
               if(line.contains("NAME")) {
-
+                  String[] numbers = line.split("NAME\\s+:\\s+[A-Z]-n[0-9]+-k");
+                  for(String number: numbers) {
+                      if(!number.isEmpty()) {
+                          this.setNumberOfTrucks(Integer.parseInt(number));
+                      }
+                  }
               }
               if(line.contains("CAPACITY")) {
                   String[] numbers = line.split("CAPACITY\\s+:\\s+");
@@ -115,6 +119,16 @@ public class CreateGraph {
         }
         this.graph.setAdjacentMatrix(matrix);
         this.graph.setNodes(nodes);
+    }
+
+
+    public int getNumberOfTrucks() {
+        return numberOfTrucks;
+    }
+
+
+    public void setNumberOfTrucks(int numberOfTrucks) {
+        this.numberOfTrucks = numberOfTrucks;
     }
 
 

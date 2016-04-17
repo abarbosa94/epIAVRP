@@ -226,7 +226,8 @@ public class SimulatedAnnealing {
         }
 
         Collections.shuffle(randomNumbers);
-        randomNumbers = randomNumbers.subList(0, 5);
+        if(randomNumbers.size()<5) randomNumbers = randomNumbers.subList(0, numberOfTrucks);
+        else randomNumbers = randomNumbers.subList(0, 5);
         //customers for
         for(int k = 0; k< indexesToRemove.size(); k++) {
             int minimumIndex = -1;
