@@ -3,7 +3,7 @@ package br.com.ab.ia.vrp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import br.com.ab.ia.vrp.algorithm.NeighboorsTransformations;
+import br.com.ab.ia.vrp.algorithm.SimulatedAnnealing;
 import br.com.ab.ia.vrp.model.Graph;
 import br.com.ab.ia.vrp.model.Node;
 import br.com.ab.ia.vrp.read.CreateGraph;
@@ -17,32 +17,9 @@ public class ProblemSolution {
         Graph graphT = read.getGraph();
         Node[] nodes = graphT.getNodes();
         int numberOfTrucks = read.getNumberOfTrucks();
-        //SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, numberOfTrucks);
+        SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, numberOfTrucks);
         HashMap<Integer, ArrayList<Integer>> result = new HashMap<Integer, ArrayList<Integer>>();
-        NeighboorsTransformations test = new NeighboorsTransformations();
-        result = test.InitialSolution(graphT, numberOfTrucks);
-        result = test.MoveTransformation(result, graphT);
-        for(int i = 0; i<result.get(0).size(); i++) {
-            System.out.print(result.get(0).get(i)+" ");
-        }
-        System.out.println();
-
-        //DataTypeTranslation dt = new DataTypeTranslation();
-        //ashMap<Integer, int[]> test = dt.TranslateDataType(sa, graphT);
-        //for (int i=0; i < test.get(0).length; i++) {
-        //    System.out.print(test.get(0)[i]+" ");
-        //}
-        //System.out.println();
-        //NeighboorsTransformations.pickNRandom(test.get(0),2);
-        //for (int i=0; i < test.get(1).length; i++) {
-        //    System.out.print(test.get(1)[i]+" ");
-       // }
-       // System.out.println();
-       // for (int i=0; i < test.get(2).length; i++) {
-        //    System.out.print(test.get(2)[i]+" ");
-        //}
-        //System.out.println();
-        //sa.AnnealingCVRP(0.99, 1.05, 5, 5000,30000000);
+        sa.AnnealingCVRP(0.99, 1.05, 5, 5000,30000000);
         long endTime   = System.currentTimeMillis();
         /*SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, numberOfTrucks);
         HashMap<Integer, Route> solution = sa.getRoutes();

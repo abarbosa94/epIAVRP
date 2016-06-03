@@ -27,71 +27,70 @@ public class SimulatedAnnealing {
         this.graph = g;
         this.node = n;
         this.numberOfTrucks = numberOfTrucks;
-        this.setRoutes(InitialSolution(this.graph, this.node,
-                this.numberOfTrucks));
+       // this.setRoutes(InitialSolution(this.graph, this.node,
+       //         this.numberOfTrucks));
     }
 
-    public void AnnealingCVRP(double alfa, double beta, double MZero, double T,
+    public HashMap<Integer,  ArrayList<Integer>> AnnealingCVRP(double alfa, double beta, double MZero, double T,
             double maxTime) {
-        HashMap<Integer, Route> bestSolution = new HashMap<Integer, Route>();
-        for (int i = 0; i < this.routes.size(); i++) {
-            Route r = new Route();
-            r.assignRoute(this.routes.get(i).getRoute());
-            r.setCapacityRoute(this.routes.get(i).getCapacityRoute(graph));
-            bestSolution.put(i, r);
-        }
-        HashMap<Integer, Route> currentS = new HashMap<Integer, Route>();
-        for (int i = 0; i < this.routes.size(); i++) {
-            Route r = new Route();
-            r.assignRoute(this.routes.get(i).getRoute());
-            r.setCapacityRoute(this.routes.get(i).getCapacityRoute(graph));
-            currentS.put(i, r);
-        }
-        int currentCost = costFunction(currentS, this.graph);
-        int bestCost = costFunction(bestSolution, this.graph);
+        HashMap<Integer,  ArrayList<Integer>> bestSolution = new HashMap<Integer,  ArrayList<Integer>>();
+        NeighboorsTransformations solution = new NeighboorsTransformations();
+        bestSolution = solution.InitialSolution(graph, numberOfTrucks);
+        HashMap<Integer, ArrayList<Integer>> currentS = new HashMap<Integer, ArrayList<Integer>>();
+        currentS = solution.InitialSolution(graph, numberOfTrucks);
+        int currentCost = costFunction(currentS.get(1));
+        int bestCost = costFunction(bestSolution.get(1));
         double time = 0;
         do {
+
             double M = MZero;
             do {
 
-                HashMap<Integer, Route> newS = new HashMap<Integer, Route>();
+                HashMap<Integer, ArrayList<Integer>> newS = new HashMap<Integer, ArrayList<Integer>>();
                 for (int i = 0; i < currentS.size(); i++) {
-                    Route r = new Route();
-                    r.assignRoute(currentS.get(i).getRoute());
-                    r.setCapacityRoute(currentS.get(i).getCapacityRoute(graph));
-                    newS.put(i, r);
+                    ArrayList<Integer> current = new ArrayList<Integer>();
+                    for(int value: currentS.get(i)) {
+                        current.add(value);
+                    }
+                    newS.put(i, current);
                 }
-                HashMap<Integer, Route> solutionTest = new HashMap<Integer, Route>();
-                 if(Math.random()<0.8) {
-                     solutionTest = MoveTransformation(newS,this.graph);
-                     if(solutionTest!=null) newS = solutionTest;
-                }
-                solutionTest = ReplaceHighestAverage(newS, this.graph);
+                HashMap<Integer, ArrayList<Integer>> solutionTest;
+                 //if(Math.random()<0.8) {
+                //   solutionTest = solution.MoveTransformation(newS,this.graph, this.numberOfTrucks);
+                 //    if(solutionTest!=null) newS = solutionTest;
+                //}
+                //solutionTest = solution.ReplaceHighestAverage(newS, this.graph, this.numberOfTrucks);
+                solutionTest = solution.OneToOneExch(newS, graph);
                 if(solutionTest!=null) newS = solutionTest;
-                int newCost = costFunction(newS, this.graph);
+                solutionTest = solution.RemoveAndInsert(newS, graph);
+                if(solutionTest!=null) newS = solutionTest;
+                solutionTest = solution.PartialReversal(newS, graph);
+                if(solutionTest!=null) newS = solutionTest;
+                int newCost = costFunction(newS.get(1));
                 int deltaCost = newCost - currentCost;
                 if (deltaCost < 0) {
                     currentS = newS;
-                    currentCost = costFunction(currentS, this.graph);
+                    currentCost = costFunction(currentS.get(1));
                     if (newCost < bestCost) {
                         bestSolution = newS;
-                        bestCost = costFunction(bestSolution, this.graph);
+                        bestCost = costFunction(bestSolution.get(1));
                     }
 
                 } else if (Math.random() < Math.pow(Math.E,
                         (-(double) deltaCost / T))) {
                     currentS = newS;
-                    currentCost = costFunction(currentS, this.graph);
+                    currentCost = costFunction(currentS.get(1));
                 }
 
                 M = M - 1;
             } while (M >= 0);
             time = time + MZero;
             T = alfa * T;
+            System.out.println(T);
             MZero = beta * MZero;
         } while (time < maxTime && T > 0.001);
 
-        this.setRoutes(bestSolution);
+        return bestSolution;
     }
 
     private HashMap<Integer, Route> InitialSolution(Graph graph, Node[] node,
@@ -117,7 +116,7 @@ public class SimulatedAnnealing {
         return routes;
     }
 
-    public HashMap<Integer, Route> MoveTransformation(HashMap<Integer, Route> original, Graph graph) {
+    /*public HashMap<Integer, Route> MoveTransformation(HashMap<Integer, Route> original, Graph graph) {
         HashMap<Integer,Route> routes = new HashMap<Integer,Route>();
         for(int keySet = 0; keySet<original.keySet().size(); keySet++) {
             Route r = new Route();
@@ -190,7 +189,7 @@ public class SimulatedAnnealing {
 
         return routes;
 
-    }
+    }*/
 
     public HashMap<Integer,Route> ReplaceHighestAverage(HashMap<Integer,Route> original, Graph graph) {
         HashMap<Integer,Route> routes = new HashMap<Integer,Route>();
@@ -375,10 +374,10 @@ public class SimulatedAnnealing {
         return result;
     }
 
-    public int costFunction(HashMap<Integer, Route> routesT, Graph g) {
+    public int costFunction(ArrayList<Integer> routesCost) {
         int totalCost = 0;
-        for (Integer keyRoute : routesT.keySet()) {
-            totalCost += routesT.get(keyRoute).calculateRouteCost(g);
+        for (Integer currentRoute : routesCost) {
+            totalCost += currentRoute;
         }
         return totalCost;
     }
