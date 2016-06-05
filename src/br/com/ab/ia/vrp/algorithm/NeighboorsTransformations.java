@@ -140,7 +140,7 @@ public class NeighboorsTransformations {
         }
         return routes;
     }
-    private ArrayList<Integer> calculateDemand(ArrayList<Integer> routes, Graph graph) {
+    public ArrayList<Integer> calculateDemand(ArrayList<Integer> routes, Graph graph) {
         ArrayList<Integer> demands = new ArrayList<Integer>();
         int[] allDemands = graph.getDemand();
         int currentDemand = 0;

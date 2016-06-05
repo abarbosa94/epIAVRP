@@ -13,25 +13,10 @@ public class Kmeans {
 	ArrayList<Integer> visitados = new ArrayList<Integer>();
 	Graph grafo;
 	boolean adjustmentHasChanged = false;
+
+
 	public Kmeans(Graph grafo) {
 		this.grafo = grafo;
-	}
-
-	public ArrayList<Cluster> solution(int trucks){
-		initialSolution(trucks);
-		clusterAdjustment();
-		solucao = routeEstabilishment();
-		return solucao;
-	}
-
-	public ArrayList<Cluster> routeEstabilishment(){
-		for(int i = 0;i<solucao.size();i++){
-			Cluster c1 = solucao.get(i);
-			//c1.getNos().add(0, 0);
-			c1.setNos(NN(c1));
-		}
-
-		return solucao;
 	}
 
 	public ArrayList<Integer> NN(Cluster c){
@@ -40,9 +25,6 @@ public class Kmeans {
 		int atual = 0;
 		int next = 0;
 		visited.add(0);
-
-		//result.add(0);
-
 		while(visited.size()!=c.getNos().size()+1){
 			int index = 0;
 			double dist = Double.MAX_VALUE;
@@ -57,47 +39,67 @@ public class Kmeans {
 			result.add(index);
 			atual = index;
 		}
-		/*for(int i = 0;i<result.size();i++){
-			System.out.print(result.get(i) +" e ");
-		}
-		System.out.println();*/
 		return result;
 	}
 
-	/*public ArrayList<Integer> TSP(Cluster c, Graph graph) {
-	    List<Integer> listNos = c.getNos();
-	    Collections.shuffle(listNos);
-	    int i =0;
-	    Node t1 = graph.getNodes()[listNos.get(i)];
-	    //int x1 = listNos.get(i+1);
 
-
-
-	}*/
-
-	public void clusterConstruction(int trucks) {
+	public ArrayList<Cluster> clusterConstruction(int trucks) {
 	    initialSolution(trucks);
-	    //n entendi pq eu faço isso
-	    NN(c);
+	    ArrayList<Cluster> finalSolution = new ArrayList<Cluster>();
+	    int fim = 0;
+	    for(Cluster c: solucao) {
+	        ArrayList<Integer> test = NN(c);
+	        test.add(0,0);
+            test.add(0);
+            NeighboorsTransformations n = new NeighboorsTransformations();
+            ArrayList<Integer> b = n.calculateDistances(test, grafo);
+            fim += b.get(1);
+	    }
+	    for(Cluster c: solucao) {
+	        Cluster a = new Cluster();
+	        a.setCapacidade(c.getCapacidade());
+	        a.setGCx(c.getGCx());
+	        a.setGCy(c.getGCy());
+	        List<Integer> nosA = c.getNos();
+	        a.setNos(nosA);
+	        finalSolution.add(a);
+	    }
+
         do {
             clusterAdjustment();
             if(adjustmentHasChanged == false) {
                 break;
             }
             else {
-                //tb n entendi aqui
-                NN(c);
+                int tmp = 0;
+                for(Cluster c: solucao) {
+                    ArrayList<Integer> test = NN(c);
+                    test.add(0,0);
+                    test.add(0);
+                    NeighboorsTransformations n = new NeighboorsTransformations();
+                    ArrayList<Integer> b = n.calculateDistances(test, grafo);
+                    tmp += b.get(1);
+                }
                 adjustmentHasChanged = false;
+                if(tmp<fim) {
+                    finalSolution.clear();
+                    for(Cluster c: solucao) {
+                        Cluster a = new Cluster();
+                        a.setCapacidade(c.getCapacidade());
+                        a.setGCx(c.getGCx());
+                        a.setGCy(c.getGCy());
+
+                        List<Integer> nosA = c.getNos();
+                        a.setNos(nosA);
+                        finalSolution.add(a);
+                    }
+                    fim = tmp;
+                }
             }
         }while(true);
 
+        return finalSolution;
 
-	}
-
-
-
-	public ArrayList<Cluster> getSolucao(){
-		return solucao;
 	}
 
 	public void clusterAdjustment(){
@@ -112,7 +114,7 @@ public class Kmeans {
 				for(int j = 0;j<solucao.size();j++){
 					Cluster c2 = solucao.get(j);
 					if(i!=j && dist(x,y,c2.getGCx(), c2.getGCy())< dist(x,y,c1.getGCx(),c1.getGCy())){
-						if(grafo.getDemand()[no]< grafo.getCapacity()-c2.getCapacidade()){
+						if(grafo.getDemand()[no]<= grafo.getCapacity()-c2.getCapacidade()){
 						    adjustmentHasChanged = true;
 							c1.getNos().remove(k);
 							c2.getNos().add(no);
@@ -136,7 +138,6 @@ public class Kmeans {
 	public void initialSolution(int trucks){
 		int [][] distancias = grafo.getAdjacentMatrix();
 		for(int i = 0;i<trucks;i++){
-			//System.out.println("novo cluster");
 			Cluster c1 = new Cluster();
 			int centro = geometricCenter(distancias);
 			setCentro(centro, c1);
@@ -146,17 +147,18 @@ public class Kmeans {
 
 			while(visitados.size()<=distancias.length-2){
 			    //check if its max or min
-				double max = 0;
+				double min = Double.MAX_VALUE;
 				int customer = -1;
 				for(int j = 1;j<distancias.length;j++){
-					if(max<distancias[centro][j] && !visitados.contains(j)){
-						max = distancias[centro][j];
+				    double tmp = dist(c1.getGCx(), c1.getGCy(), grafo.getNodes()[j].getX(), grafo.getNodes()[j].getY());
+					if(min>=tmp && !visitados.contains(j)){
+						min = tmp;
 						customer = j;
 					}
 				}
 
 				if(customer != -1 ){
-					if(c1.getCapacidade() + grafo.getDemand()[customer] > grafo.getCapacity()) break;;
+					if(c1.getCapacidade() + grafo.getDemand()[customer] > grafo.getCapacity()) break;
 					c1.getNos().add(customer);
 					c1.setCapacidade(c1.getCapacidade() + grafo.getDemand()[customer]);
 					recalculateGC(c1);
@@ -165,7 +167,6 @@ public class Kmeans {
 
 			}
 			solucao.add(c1);
-			//c1.printa();
 		}
 	}
 
@@ -191,12 +192,12 @@ public class Kmeans {
 
 	}
 
-	public Node pegaNo(int index){
+	private Node pegaNo(int index){
 		Node n = grafo.getNodes()[index];
 		return n;
 	}
 
-	public void recalculateGC(Cluster c){
+	private void recalculateGC(Cluster c){
 		double x=0;
 		double y=0;
 		Iterator<Integer> it = c.getNos().iterator();
@@ -229,7 +230,6 @@ public class Kmeans {
 		int result=0;
 		int next;
 		int previous;
-		//nos.add(0, 0);
 		previous = 0;
 		for(int i = 1;i<nos.size();i++){
 			next = nos.get(i);

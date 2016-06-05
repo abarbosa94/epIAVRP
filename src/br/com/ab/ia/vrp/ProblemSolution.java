@@ -19,24 +19,41 @@ public class ProblemSolution {
         int numberOfTrucks = read.getNumberOfTrucks();
         SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, numberOfTrucks);
         HashMap<Integer, ArrayList<Integer>> result = new HashMap<Integer, ArrayList<Integer>>();
-        sa.AnnealingCVRP(0.99, 1.05, 5, 5000,30000000);
+        result = sa.AnnealingCVRP(0.99, 1.05, 5, 5000,5000000);
+        result.get(0).add(0,0);
         long endTime   = System.currentTimeMillis();
-        /*SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, numberOfTrucks);
-        HashMap<Integer, Route> solution = sa.getRoutes();
         long totalTime = endTime - startTime;
-
-        for(int i=0; i< solution.keySet().size();i++) {
-            System.out.print("Rota #"+(i+1)+": ");
-            for(int j = 0; j<solution.get(i).getRoute().size(); j++) {
-                System.out.print(solution.get(i).getRoute().get(j)+" ");
+        int count = 0;
+        int current = 0;
+        for(int i = 0; i<result.get(0).size(); i++) {
+            if(result.get(0).get(i) == 0 && count == 0) {
+                System.out.print("Rota #"+(current+1)+" ");
+                count++;
             }
-            System.out.print("custo: ");
-            System.out.print(solution.get(i).calculateRouteCost(graphT)+" ");
-            System.out.println("demanda atendida: "+solution.get(i).getCapacityRoute(graphT));
-
+            else if(result.get(0).get(i) == 0 ){
+                count++;
+            }
+            if(count==2) {
+                count = 0;
+                System.out.println(result.get(0).get(i));
+                System.out.print("custo: "+result.get(1).get(current) +" ");
+                System.out.print("demanda atendida: "+result.get(2).get(current));
+                System.out.println();
+                current++;
+                if(i==result.get(0).size()-1) break;
+                System.out.print("Rota #"+(current+1)+" ");
+                count++;
+            }
+            else{
+                System.out.print(result.get(0).get(i)+" ");
+            }
         }
-        System.out.println("Custo: "+sa.costFunction(solution, graphT));
-        System.out.println("Tempo: "+totalTime);*/
+        int fim = 0;
+        for(Integer i: result.get(1)) {
+            fim+= i;
+        }
+        System.out.println("Custo: "+fim);
+        System.out.println("Tempo: "+totalTime);
 
     }
 

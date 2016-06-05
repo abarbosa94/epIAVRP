@@ -2,7 +2,6 @@ package br.com.ab.ia.vrp.model;
 
 public class Node implements Comparable<Node>  {
     public boolean visited;
-    public Route route;
     private int index;
     private double x;
     private double y;
