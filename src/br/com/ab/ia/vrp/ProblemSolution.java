@@ -13,13 +13,13 @@ public class ProblemSolution {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        CreateGraph read = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/A-VRP/A-n32-k5.vrp");
+        CreateGraph read = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/P-VRP/P-n23-k8.vrp");
         Graph graphT = read.getGraph();
         Node[] nodes = graphT.getNodes();
         int numberOfTrucks = read.getNumberOfTrucks();
         SimulatedAnnealing sa = new SimulatedAnnealing(graphT, nodes, numberOfTrucks);
         HashMap<Integer, ArrayList<Integer>> result = new HashMap<Integer, ArrayList<Integer>>();
-        result = sa.AnnealingCVRP(0.99, 1.05, 5, 5000,5000000);
+        result = sa.AnnealingCVRP(0.99, 1.05, 5, 5000,30000000);
         result.get(0).add(0,0);
         long endTime   = System.currentTimeMillis();
         long totalTime = endTime - startTime;

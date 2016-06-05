@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String args[]){
         long startTime = System.currentTimeMillis();
-        CreateGraph Entrada = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/A-VRP/A-n32-k5.vrp");
+        CreateGraph Entrada = new CreateGraph("/Users/abarbosa/Documents/workspace/ep1IA/src/br/com/ab/ia/vrp/read/P-VRP/P-n23-k8.vrp");
         Graph grafo = Entrada.getGraph();
         int trucks = Entrada.getNumberOfTrucks();
         Kmeans k = new Kmeans(grafo);
